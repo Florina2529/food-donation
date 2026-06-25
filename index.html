@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Donation Platform</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{font-family:Arial,sans-serif;}
+.hero{background:#e8f5e9;padding:100px 20px;text-align:center;}
+.hero h1{color:#2E7D32;font-size:48px;font-weight:bold;}
+.hero p{font-size:20px;}
+.stats{padding:50px;text-align:center;background:#fff;}
+footer{margin-top:0;}
+</style>
+</head>
+<body>
+<div id="mainNav"></div>
+
+<section class="hero">
+  <h1>Reduce Food Waste, Feed More Lives</h1>
+  <p>Connecting Restaurants, Hotels, NGOs and People in Need</p>
+  <a href="donate.html" class="btn btn-success btn-lg me-2">Donate Food</a>
+  <a href="register.html" class="btn btn-outline-success btn-lg">Register as NGO</a>
+</section>
+
+<section class="stats">
+  <h2 class="mb-4">Our Impact</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-4"><h1 class="text-success" id="statDonations">0</h1><p>Food Donations</p></div>
+    <div class="col-md-4"><h1 class="text-success" id="statNGOs">0</h1><p>NGOs Connected</p></div>
+    <div class="col-md-4"><h1 class="text-success" id="statRequests">0</h1><p>Food Requests</p></div>
+  </div>
+</section>
+
+<!-- NGO Food Requests -->
+<section class="container my-5">
+  <h2 class="text-center mb-4">Active NGO Food Requests</h2>
+  <div id="requestCards" class="row"></div>
+  <div id="noRequests" class="text-center text-muted py-4" style="display:none;">No active food requests at the moment.</div>
+</section>
+
+<section class="container my-5">
+  <h2 class="text-center mb-4">How It Works</h2>
+  <div class="row">
+    <div class="col-md-3 mb-3"><div class="card shadow text-center p-3"><h3>1</h3><p>Donate Food</p></div></div>
+    <div class="col-md-3 mb-3"><div class="card shadow text-center p-3"><h3>2</h3><p>NGO Accepts</p></div></div>
+    <div class="col-md-3 mb-3"><div class="card shadow text-center p-3"><h3>3</h3><p>Food Pickup</p></div></div>
+    <div class="col-md-3 mb-3"><div class="card shadow text-center p-3"><h3>4</h3><p>Food Delivered</p></div></div>
+  </div>
+</section>
+
+<footer class="bg-success text-white text-center p-3">
+  © 2026 Smart Sustainable Food Donation Platform
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>
+buildNav('index');
+
+// Stats
+var donations = Store.load('donations');
+var ngos = Store.load('ngos').filter(function(n){ return n.status === 'approved'; });
+var requests = Store.load('requests');
+document.getElementById('statDonations').textContent = donations.length;
+document.getElementById('statNGOs').textContent = ngos.length;
+document.getElementById('statRequests').textContent = requests.length;
+
+// NGO food requests
+var activeRequests = requests.filter(function(r){ return r.status === 'open'; });
+if (activeRequests.length === 0) {
+  document.getElementById('noRequests').style.display = 'block';
+} else {
+  var html = '';
+  activeRequests.forEach(function(r) {
+    html += '<div class="col-md-4 mb-4"><div class="card shadow">' +
+      '<div class="card-body">' +
+      '<h5 class="card-title">' + escHtml(r.foodType) + '</h5>' +
+      '<p><strong>NGO:</strong> ' + escHtml(r.ngoName) + '</p>' +
+      '<p><strong>Quantity Needed:</strong> ' + escHtml(r.quantity) + '</p>' +
+      '<p><strong>Location:</strong> ' + escHtml(r.location) + '</p>' +
+      (r.note ? '<p class="text-muted small">' + escHtml(r.note) + '</p>' : '') +
+      '<p><small class="text-muted">Posted: ' + r.createdAt + '</small></p>' +
+      '<a href="donate.html" class="btn btn-success btn-sm">Donate Now</a>' +
+      '</div></div></div>';
+  });
+  document.getElementById('requestCards').innerHTML = html;
+}
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
